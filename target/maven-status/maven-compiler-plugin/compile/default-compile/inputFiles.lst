@@ -1,5 +1,17 @@
+D:\Projetos\POO\citizentech-alagamentos\src\main\java\dominio\ComponenteTerritorial.java
+D:\Projetos\POO\citizentech-alagamentos\src\main\java\dominio\DadosTerritorio.java
+D:\Projetos\POO\citizentech-alagamentos\src\main\java\dominio\LimiaresAlerta.java
 D:\Projetos\POO\citizentech-alagamentos\src\main\java\dominio\Local.java
+D:\Projetos\POO\citizentech-alagamentos\src\main\java\dominio\Medicao.java
+D:\Projetos\POO\citizentech-alagamentos\src\main\java\dominio\PontoMonitorado.java
 D:\Projetos\POO\citizentech-alagamentos\src\main\java\dominio\RegistroAlagamento.java
+D:\Projetos\POO\citizentech-alagamentos\src\main\java\dominio\Sensor.java
+D:\Projetos\POO\citizentech-alagamentos\src\main\java\dominio\SensorChuva.java
+D:\Projetos\POO\citizentech-alagamentos\src\main\java\dominio\SensorNivelAgua.java
+D:\Projetos\POO\citizentech-alagamentos\src\main\java\dominio\SensorUmidadeSolo.java
 D:\Projetos\POO\citizentech-alagamentos\src\main\java\dominio\StatusDrenagem.java
+D:\Projetos\POO\citizentech-alagamentos\src\main\java\excecao\DadosInvalidosException.java
+D:\Projetos\POO\citizentech-alagamentos\src\main\java\excecao\FonteIndisponivelException.java
 D:\Projetos\POO\citizentech-alagamentos\src\main\java\Main.java
 D:\Projetos\POO\citizentech-alagamentos\src\main\java\persistencia\RegistroAlagamentoRepositorio.java
+D:\Projetos\POO\citizentech-alagamentos\src\main\java\servico\MonitoramentoAlagamentoServico.java

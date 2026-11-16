@@ -17,4 +17,7 @@ public class MonitoramentoAlagamentoServico {
                 .filter(registro -> registro.nivelAguaEmCentimetros() > 0)
                 .toList();
     }
+    public void registrarObservacao(RegistroAlagamento registro) {
+    repositorio.salvar(registro);
+    }   
 }
