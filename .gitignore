@@ -1,0 +1,28 @@
+# Diretório de compilação do Maven
+target/
+
+# Arquivos compilados e logs do Java
+*.class
+*.log
+*.jar
+
+# Configurações de IDEs
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.metadata/
+.vscode/
+
+# Arquivos temporários de sistema operacional
+.DS_Store
+Thumbs.db
+
+# Banco H2 local
+dados/
+*.mv.db
+*.trace.db
+
+# Ferramenta de upgrade do Java
+.github/modernize/
