@@ -11,6 +11,9 @@ import dominio.DadosTerritorio;
 import dominio.LimiaresAlerta;
 import servico.FabricaPrevisao;
 import servico.ServicoPrevisao;
+import dominio.Local;
+import dominio.PontoMonitorado;
+import dominio.StatusDrenagem;
 
 import java.time.LocalDateTime;
 import java.sql.SQLException;
@@ -51,13 +54,18 @@ dadosTerritorio.alterarLimiares(
                 new SensorChuva("chuva-01", true),
                 new SensorUmidadeSolo("umidade-01", true)
         );
-
-        try (var entrada = new Scanner(System.in)) {
+var local = new Local("Praça Central", 12.0, StatusDrenagem.INSUFICIENTE);
+var ponto = new PontoMonitorado("ponto-01", "Centro", true, local, sensores);
+        
+    try (var entrada = new Scanner(System.in)) {
             while (true) {
                 System.out.println("\n1 - Listar alertas");
                 System.out.println("2 - Ler sensores e gravar medições");
                 System.out.println("3 - Consultar medições por sensor");
                 System.out.println("4 - Rodar previsão");
+                System.out.println("5 - Verificar sensores");
+                System.out.println("6 - Gerenciar dados do território");
+                System.out.println("7 - Exibir status completo");
                 System.out.println("0 - Sair");
                 if (!entrada.hasNextLine()) {
                     return;
@@ -70,6 +78,9 @@ dadosTerritorio.alterarLimiares(
                     case "4" -> rodarPrevisao(
         entrada, medicaoDAO, servicoPrevisao, fabricaPrevisao, dadosTerritorio
 );
+                    case "5" -> verificarSensores(sensores);
+                    case "6" -> gerenciarDadosTerritorio(entrada, dadosTerritorio);
+                    case "7" -> exibirStatusCompleto(ponto, sensores, dadosTerritorio);
                     case "0" -> {
                         return;
                     }
@@ -78,7 +89,93 @@ dadosTerritorio.alterarLimiares(
             }
         }
     }
+private static void gerenciarDadosTerritorio(
+        Scanner entrada, DadosTerritorio dadosTerritorio
+) {
+    System.out.print("ID do sensor (nivel-01, chuva-01 ou umidade-01): ");
+    if (!entrada.hasNextLine()) {
+        return;
+    }
+    String sensorId = entrada.nextLine().trim();
 
+    var atuais = dadosTerritorio.consultarLimiares(sensorId);
+    if (atuais.isEmpty()) {
+        System.out.println("Não há limiares configurados para esse sensor.");
+        return;
+    }
+
+    var limiares = atuais.orElseThrow();
+    System.out.printf("Atenção: %.1f | Alerta: %.1f | Crítico: %.1f%n",
+            limiares.atencao(), limiares.alerta(), limiares.critico());
+
+    System.out.print("Novos limiares separados por espaço, ou Enter para voltar: ");
+    if (!entrada.hasNextLine()) {
+        return;
+    }
+    String linha = entrada.nextLine().trim();
+    if (linha.isEmpty()) {
+        return;
+    }
+
+    String[] valores = linha.split("\\s+");
+    if (valores.length != 3) {
+        System.out.println("Informe três valores na ordem: atenção, alerta e crítico.");
+        return;
+    }
+
+    try {
+        var novosLimiares = new LimiaresAlerta(
+                Double.parseDouble(valores[0].replace(',', '.')),
+                Double.parseDouble(valores[1].replace(',', '.')),
+                Double.parseDouble(valores[2].replace(',', '.'))
+        );
+
+        System.out.print("Código de acesso: ");
+        if (!entrada.hasNextLine()) {
+            return;
+        }
+
+        dadosTerritorio.alterarLimiares(sensorId, novosLimiares, entrada.nextLine());
+        System.out.println("Limiares atualizados.");
+    } catch (NumberFormatException erro) {
+        System.out.println("Digite três valores numéricos, por exemplo: 12 22 32.");
+    } catch (DadosInvalidosException erro) {
+        System.out.println(erro.getMessage());
+    }
+}
+private static void exibirStatusCompleto(
+        PontoMonitorado ponto, List<Sensor> sensores, DadosTerritorio dadosTerritorio
+) {
+    String estado = ponto.verificarStatus() ? "Operacional" : "Indisponível";
+    System.out.printf("%s | %s | %s%n", ponto.nome(), ponto.regiao(), estado);
+
+    var local = ponto.local();
+    System.out.printf("Elevação: %.1f m | Drenagem: %s%n",
+            local.elevacaoEmMetros(), local.statusDrenagem());
+
+    System.out.println("\nSensores");
+    verificarSensores(sensores);
+
+    System.out.println("\nLimiares por sensor");
+    for (Sensor sensor : sensores) {
+        dadosTerritorio.consultarLimiares(sensor.id()).ifPresentOrElse(
+                limiares -> System.out.printf(
+                        "%s | Atenção: %.1f | Alerta: %.1f | Crítico: %.1f%n",
+                        sensor.id(), limiares.atencao(), limiares.alerta(), limiares.critico()
+                ),
+                () -> System.out.println(sensor.id() + " | Sem limiares configurados")
+        );
+    }
+}
+private static void verificarSensores(List<Sensor> sensores) {
+    for (Sensor sensor : sensores) {
+        String estado = sensor.verificarFuncionamento()
+                ? "Funcionando"
+                : "Indisponível";
+
+        System.out.printf("%s | %s | %s%n", sensor.id(), sensor.tipo(), estado);
+    }
+}
     private static void lerEGravarMedicoes(List<Sensor> sensores, MedicaoDAO medicaoDAO) {
         for (Sensor sensor : sensores) {
             try {
